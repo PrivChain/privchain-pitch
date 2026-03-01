@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PrivChain — Pitch Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #080c12;
+      --surface:  #0d1420;
+      --surface2: #121b2a;
+      --border:   #1e2d42;
+      --border2:  #243347;
+      --accent:   #00d4ff;
+      --accent2:  #7c3aed;
+      --green:    #00e676;
+      --yellow:   #ffd740;
+      --red:      #ff5252;
+      --muted:    #4a6080;
+      --text:     #c8d8e8;
+      --text2:    #8aa0b8;
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── Slide Container ─── */
+    #deck {
+      position: relative; z-index: 1;
+      width: 100vw; height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 60px 80px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      transform: translateX(60px);
+    }
+    .slide.active {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateX(0);
+    }
+    .slide.exit {
+      opacity: 0;
+      transform: translateX(-60px);
+      pointer-events: none;
+    }
+
+    /* ─── Slide Counter ─── */
+    #counter {
+      position: fixed; top: 24px; right: 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px; color: var(--muted);
+      z-index: 100;
+      letter-spacing: 1px;
+    }
+
+    /* ─── Nav Arrows ─── */
+    #nav-prev, #nav-next {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      background: rgba(13,20,32,0.8);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 100;
+      font-size: 18px;
+      transition: all 0.2s;
+    }
+    #nav-prev { left: 16px; }
+    #nav-next { right: 16px; }
+    #nav-prev:hover, #nav-next:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 0 12px rgba(0,212,255,0.2);
+    }
+
+    /* ─── Keyboard hint ─── */
+    #hint {
+      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; color: var(--muted);
+      letter-spacing: 0.5px; z-index: 100;
+    }
+    #hint kbd {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: inherit;
+      font-size: 10px;
+    }
+
+    /* ─── Progress bar ─── */
+    #progress {
+      position: fixed; bottom: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width 0.4s ease;
+      z-index: 100;
+    }
+
+    /* ─── Typography ─── */
+    .slide-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; font-weight: 600;
+      color: var(--accent); letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 16px;
+    }
+
+    h1.hero {
+      font-size: clamp(48px, 8vw, 96px);
+      font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, #00d4ff 0%, #a78bfa 50%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 20px;
+    }
+
+    h2.slide-title {
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 800; line-height: 1.1;
+      color: var(--text); margin-bottom: 12px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: clamp(16px, 2vw, 22px);
+      color: var(--text2); line-height: 1.5;
+    }
+
+    .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; font-weight: 600;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--accent);
+      padding: 6px 14px; border-radius: 20px;
+      letter-spacing: 1px;
+      margin-bottom: 24px;
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+    }
+    .card-accent {
+      border-color: rgba(0,212,255,0.3);
+      box-shadow: 0 0 20px rgba(0,212,255,0.06);
+    }
+
+    /* ─── Three column layout ─── */
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%; max-width: 960px;
+    }
+
+    .col-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .col-card .icon { font-size: 36px; margin-bottom: 14px; }
+    .col-card .col-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px; font-weight: 700;
+      color: var(--accent); margin-bottom: 10px;
+    }
+    .col-card .col-desc {
+      font-size: 13px; color: var(--text2); line-height: 1.6;
+    }
+
+    /* ─── Bullet list ─── */
+    .bullet-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 14px;
+      width: 100%; max-width: 700px;
+    }
+    .bullet-list li {
+      display: flex; align-items: flex-start; gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 16px; color: var(--text);
+    }
+    .bullet-list li .bicon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+
+    /* ─── Flow diagram ─── */
+    .flow {
+      display: flex; flex-direction: column; gap: 0;
+      width: 100%; max-width: 780px;
+    }
+    .flow-step {
+      display: flex; align-items: flex-start; gap: 20px;
+      padding: 20px 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .flow-step + .flow-step {
+      margin-top: 4px;
+      border-radius: 14px;
+    }
+    .flow-connector {
+      width: 2px; height: 24px;
+      background: linear-gradient(var(--accent), var(--accent2));
+      margin-left: 34px;
+    }
+    .step-num {
+      width: 36px; height: 36px; flex-shrink: 0;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px; font-weight: 700; color: #000;
+    }
+    .step-content .step-title {
+      font-size: 15px; font-weight: 700; color: var(--text);
+      margin-bottom: 4px;
+    }
+    .step-content .step-desc {
+      font-size: 13px; color: var(--text2); line-height: 1.5;
+    }
+    .step-tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      background: rgba(0,212,255,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0,212,255,0.2);
+      padding: 2px 8px; border-radius: 4px;
+      margin-top: 6px;
+    }
+
+    /* ─── Stack diagram ─── */
+    .stack {
+      display: flex; flex-direction: column-reverse;
+      gap: 4px; width: 100%; max-width: 700px;
+    }
+    .stack-layer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .stack-layer.active-layer {
+      border-color: rgba(0,212,255,0.5);
+      background: rgba(0,212,255,0.06);
+      box-shadow: 0 0 16px rgba(0,212,255,0.12);
+    }
+    .stack-layer .layer-num {
+      font-size: 11px; color: var(--muted); min-width: 60px;
+    }
+    .stack-layer .layer-name {
+      font-weight: 600; flex: 1; padding: 0 12px;
+    }
+    .stack-layer.active-layer .layer-name { color: var(--accent); }
+    .stack-layer .layer-tag {
+      font-size: 10px;
+      background: rgba(0,212,255,0.1);
+      color: var(--accent); border: 1px solid rgba(0,212,255,0.2);
+      padding: 2px 8px; border-radius: 4px;
+    }
+    .stack-layer .layer-tag.roadmap {
+      background: rgba(124,58,237,0.1);
+      color: #a78bfa; border-color: rgba(124,58,237,0.3);
+    }
+
+    /* ─── Dispute flow ─── */
+    .dispute-flow {
+      display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap; justify-content: center;
+      width: 100%; max-width: 800px;
+    }
+    .d-step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 13px; color: var(--text);
+      min-width: 140px;
+    }
+    .d-step .d-icon { font-size: 22px; margin-bottom: 6px; }
+    .d-arrow { color: var(--muted); font-size: 20px; }
+
+    /* ─── Market stats ─── */
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      gap: 16px; width: 100%; max-width: 860px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 20px; text-align: center;
+    }
+    .stat-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+    .stat-label { font-size: 14px; color: var(--text2); line-height: 1.5; }
+
+    /* ─── Q&A cards ─── */
+    .qa-grid {
+      display: grid; grid-template-columns: repeat(2,1fr);
+      gap: 16px; width: 100%; max-width: 920px;
+    }
+    .qa-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+    }
+    .qa-card .qa-q {
+      font-size: 13px; font-weight: 700; color: var(--yellow);
+      margin-bottom: 10px; font-style: italic;
+    }
+    .qa-card .qa-a {
+      font-size: 12px; color: var(--text2); line-height: 1.6;
+    }
+    .qa-card .qa-a strong { color: var(--accent); font-style: normal; }
+
+    /* ─── QR Placeholder ─── */
+    .qr-box {
+      width: 140px; height: 140px;
+      border: 2px dashed var(--border2);
+      border-radius: 12px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px; color: var(--muted); text-align: center;
+      padding: 10px;
+      background: var(--surface);
+    }
+    .qr-inner {
+      display: grid;
+      grid-template-columns: repeat(7,12px);
+      grid-template-rows: repeat(7,12px);
+      gap: 2px; margin-bottom: 8px;
+    }
+    .qr-cell {
+      border-radius: 2px;
+      background: var(--muted);
+    }
+    .qr-cell.on { background: var(--accent); }
+
+    /* ─── CTA Button ─── */
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #000; font-weight: 800; font-size: 18px;
+      padding: 16px 36px; border-radius: 12px;
+      text-decoration: none; cursor: pointer;
+      border: none;
+      box-shadow: 0 0 30px rgba(0,212,255,0.3);
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+    .cta-btn:hover {
+      box-shadow: 0 0 50px rgba(0,212,255,0.5);
+      transform: translateY(-2px);
+    }
+
+    /* ─── Link list ─── */
+    .link-row {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      margin-top: 16px;
+    }
+    .link-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text2);
+      padding: 8px 16px; border-radius: 8px;
+    }
+    .link-chip a { color: var(--accent); text-decoration: none; }
+
+    /* ─── Slide-specific ─── */
+    .slide-inner {
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      width: 100%;
+    }
+    .slide-inner.left { align-items: flex-start; text-align: left; }
+
+    .divider {
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      margin: 16px auto;
+    }
+    .divider.left { margin: 16px 0; }
+
+    /* bold alert */
+    .alert-text {
+      font-size: clamp(14px, 2vw, 18px);
+      font-weight: 800;
+      color: var(--text);
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-left: 3px solid var(--red);
+      padding: 14px 20px;
+      border-radius: 8px;
+      margin-top: 16px;
+      max-width: 700px;
+    }
+
+    .demo-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px; font-weight: 600;
+      color: var(--accent);
+      margin: 10px 0;
+    }
+    .demo-stats {
+      display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+      margin-top: 10px;
+    }
+    .stat-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.2);
+      color: var(--accent);
+      padding: 5px 12px; border-radius: 20px;
+    }
+
+    /* Slide 10 logo */
+    .logo-big {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(40px, 7vw, 80px);
+      font-weight: 700;
+      background: linear-gradient(135deg, #00d4ff 0%, #a78bfa 60%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+      margin-bottom: 4px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .slide.active .animate-1 { animation: fadeUp 0.5s 0.05s both; }
+    .slide.active .animate-2 { animation: fadeUp 0.5s 0.15s both; }
+    .slide.active .animate-3 { animation: fadeUp 0.5s 0.25s both; }
+    .slide.active .animate-4 { animation: fadeUp 0.5s 0.35s both; }
+    .slide.active .animate-5 { animation: fadeUp 0.5s 0.45s both; }
+    .slide.active .animate-6 { animation: fadeUp 0.5s 0.55s both; }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,212,255,0.2); }
+      50%       { box-shadow: 0 0 40px rgba(0,212,255,0.4); }
+    }
+    .glow-pulse { animation: pulseGlow 3s ease-in-out infinite; }
+  </style>
+</head>
+<body>
+
+<div id="counter">1 / 10</div>
+<div id="progress" style="width:10%"></div>
+<button id="nav-prev" onclick="prevSlide()" aria-label="Previous">‹</button>
+<button id="nav-next" onclick="nextSlide()" aria-label="Next">›</button>
+<div id="hint"><kbd>←</kbd> <kbd>→</kbd> arrow keys to navigate &nbsp;·&nbsp; <kbd>Space</kbd> to advance</div>
+
+<div id="deck">
+
+  <!-- ────────────── SLIDE 1: TITLE ────────────── -->
+  <div class="slide active" id="slide-1">
+    <div class="slide-inner">
+      <div class="badge animate-1">EasyA × Consensus Miami 2026</div>
+      <h1 class="hero animate-2">PrivChain</h1>
+      <div class="subtitle animate-3" style="font-size:clamp(18px,2.5vw,28px); font-weight:600; color:var(--text); margin-bottom:12px;">
+        Private payments for AI agents
+      </div>
+      <div class="divider animate-4"></div>
+      <div class="subtitle animate-4" style="max-width:620px; margin-top:8px;">
+        The missing financial privacy layer for the autonomous AI economy
+      </div>
+      <div class="animate-5" style="margin-top:32px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+        <span class="stat-pill">⚡ Live on Solana devnet</span>
+        <span class="stat-pill">🔐 ZK commitments</span>
+        <span class="stat-pill">🌊 Denomination mixing</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 2: PROBLEM ────────────── -->
+  <div class="slide" id="slide-2">
+    <div class="slide-inner" style="max-width:800px;">
+      <div class="slide-tag animate-1">The Problem</div>
+      <h2 class="slide-title animate-2">AI agents are going to transact<br><span class="gradient-text">trillions of dollars</span></h2>
+      <p class="subtitle animate-3" style="margin-bottom:24px;">Every payment is currently public on-chain.</p>
+      <ul class="bullet-list animate-4">
+        <li>
+          <span class="bicon">🔍</span>
+          <span>Anyone can see who your agents hire and what they pay</span>
+        </li>
+        <li>
+          <span class="bicon">🗺️</span>
+          <span>Competitors can map your entire AI supply chain</span>
+        </li>
+        <li>
+          <span class="bicon">📊</span>
+          <span>Amount uniqueness makes every payment traceable</span>
+        </li>
+      </ul>
+      <div class="alert-text animate-5">
+        🚨 There is no financial privacy layer for AI agents
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 3: SOLUTION ────────────── -->
+  <div class="slide" id="slide-3">
+    <div class="slide-inner">
+      <div class="slide-tag animate-1">The Solution</div>
+      <h2 class="slide-title animate-2">PrivChain: Private AI Agent Payments</h2>
+      <div class="divider animate-2"></div>
+      <div class="three-col animate-3" style="margin-top:8px;">
+        <div class="col-card">
+          <div class="icon">🔐</div>
+          <div class="col-title">ZK Commitments</div>
+          <div class="col-desc">Nullifier + proof generated client-side. Reveals nothing about the deliverable or amount.</div>
+        </div>
+        <div class="col-card">
+          <div class="icon">🌊</div>
+          <div class="col-title">Denomination Mixing</div>
+          <div class="col-desc">Payments split into standard amounts. Total hidden in plain sight — indistinguishable from routine transfers.</div>
+        </div>
+        <div class="col-card">
+          <div class="icon">✅</div>
+          <div class="col-title">Commitment-Reveal</div>
+          <div class="col-desc">Agent B commits before delivery. Agent A approves before payment fires. Trustless. Pseudonymous.</div>
+        </div>
+      </div>
+      <div class="animate-4" style="margin-top:24px; font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; color:var(--accent);">
+        Not just pseudonymous. Actually private.
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 4: HOW IT WORKS ────────────── -->
+  <div class="slide" id="slide-4">
+    <div class="slide-inner">
+      <div class="slide-tag animate-1">How It Works</div>
+      <h2 class="slide-title animate-2">Three-step private settlement</h2>
+      <div class="flow animate-3" style="margin-top:20px;">
+        <div class="flow-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Agent B commits deliverable hash on-chain</div>
+            <div class="step-desc">Before starting work, Agent B generates a hash of the deliverable and publishes a commitment. Neither party identity nor content is revealed.</div>
+            <span class="step-tag">commit_deliverable(hash, nullifier)</span>
+          </div>
+        </div>
+        <div class="flow-connector"></div>
+        <div class="flow-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Agent A locks payment commitment + nullifier</div>
+            <div class="step-desc">Agent A locks funds with a ZK commitment. The payment amount and recipient are encrypted. A nullifier prevents double-spending.</div>
+            <span class="step-tag">lock_payment(commitment, nullifier, zk_proof)</span>
+          </div>
+        </div>
+        <div class="flow-connector"></div>
+        <div class="flow-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Agent A reviews → approves → denomination-mixed settlement fires</div>
+            <div class="step-desc">On approval, the settlement splits into standard-denomination transfers routed via pool wallet. The total never appears as a single on-chain figure.</div>
+            <span class="step-tag">approve() → denomination_mix(500 + 250 PRIV) → settle</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 5: LIVE DEMO ────────────── -->
+  <div class="slide" id="slide-5">
+    <div class="slide-inner">
+      <div class="slide-tag animate-1">Live Demo</div>
+      <h2 class="slide-title animate-2">Working demo <span class="gradient-text">right now</span></h2>
+      <div class="animate-3" style="display:flex; gap:32px; align-items:center; justify-content:center; margin-top:20px; flex-wrap:wrap;">
+        <!-- QR placeholder -->
+        <div>
+          <div class="qr-box glow-pulse animate-3">
+            <div style="font-size:28px; margin-bottom:8px;">📱</div>
+            <div>QR:</div>
+            <div style="color:var(--accent); margin-top:4px;">privchain.github.io</div>
+            <div style="color:var(--accent)">/privchain-demo</div>
+          </div>
+        </div>
+        <div style="text-align:left;">
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div class="card card-accent animate-3" style="display:flex; align-items:center; gap:12px; padding:14px 18px;">
+              <span style="font-size:22px;">✅</span>
+              <span style="font-size:15px; font-weight:600;">Real PRIV token on Solana devnet</span>
+            </div>
+            <div class="card card-accent animate-4" style="display:flex; align-items:center; gap:12px; padding:14px 18px;">
+              <span style="font-size:22px;">⛓️</span>
+              <span style="font-size:15px; font-weight:600;">Real on-chain transactions</span>
+            </div>
+            <div class="card card-accent animate-5" style="display:flex; align-items:center; gap:12px; padding:14px 18px;">
+              <span style="font-size:22px;">⚡</span>
+              <span style="font-size:15px; font-weight:600;">Three scenarios: Happy Path, Dispute, Impossible Task</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-url animate-4" style="margin-top:20px;">privchain.github.io/privchain-demo</div>
+      <div class="demo-stats animate-5">
+        <span class="stat-pill">&lt;2s settlement</span>
+        <span class="stat-pill">priv-stark/v1</span>
+        <span class="stat-pill">Solana devnet</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 6: PRIVACY STACK ────────────── -->
+  <div class="slide" id="slide-6">
+    <div class="slide-inner">
+      <div class="slide-tag animate-1">Architecture</div>
+      <h2 class="slide-title animate-2">The Privacy Stack</h2>
+      <p class="subtitle animate-3" style="margin-bottom:24px;">We're building from the ground up. Here's where we are.</p>
+      <div class="stack animate-4" style="max-width:760px;">
+        <div class="stack-layer" style="opacity:0.5;">
+          <span class="layer-num">Layer 0</span>
+          <span class="layer-name" style="color:var(--muted);">Pseudonymous Wallets</span>
+          <span class="layer-tag roadmap" style="background:rgba(74,96,128,0.1); color:var(--muted); border-color:var(--border);">baseline</span>
+        </div>
+        <div class="stack-layer active-layer">
+          <span class="layer-num">Layer 1</span>
+          <span class="layer-name">ZK Commitment-Reveal</span>
+          <span class="layer-tag">← WE ARE HERE</span>
+        </div>
+        <div class="stack-layer active-layer">
+          <span class="layer-num">Layer 2</span>
+          <span class="layer-name">Denomination Mixing</span>
+          <span class="layer-tag">← WE ARE HERE</span>
+        </div>
+        <div class="stack-layer" style="opacity:0.6;">
+          <span class="layer-num">Layer 3</span>
+          <span class="layer-name" style="color:var(--text2);">Token-2022 Confidential Transfers</span>
+          <span class="layer-tag roadmap">V2 roadmap</span>
+        </div>
+        <div class="stack-layer" style="opacity:0.6;">
+          <span class="layer-num">Layer 4</span>
+          <span class="layer-name" style="color:var(--text2);">Stealth Addresses</span>
+          <span class="layer-tag roadmap">V2 roadmap</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 7: DISPUTES ────────────── -->
+  <div class="slide" id="slide-7">
+    <div class="slide-inner">
+      <div class="slide-tag animate-1">Dispute Resolution</div>
+      <h2 class="slide-title animate-2">What if Agent A rejects the work?</h2>
+      <div class="divider animate-2"></div>
+      <div class="dispute-flow animate-3" style="margin-top:16px;">
+        <div class="d-step">
+          <div class="d-icon">⚠️</div>
+          <div style="font-weight:700; margin-bottom:4px; font-size:12px; color:var(--yellow);">DISPUTE RAISED</div>
+          <div style="font-size:12px; color:var(--text2);">Agent A challenges<br>the deliverable</div>
+        </div>
+        <div class="d-arrow">→</div>
+        <div class="d-step">
+          <div class="d-icon">🗳️</div>
+          <div style="font-weight:700; margin-bottom:4px; font-size:12px; color:var(--accent);">DAO VOTE</div>
+          <div style="font-size:12px; color:var(--text2);">Arbitrators vote<br>(3 of 5 required)</div>
+        </div>
+        <div class="d-arrow">→</div>
+        <div class="d-step">
+          <div class="d-icon">⚖️</div>
+          <div style="font-weight:700; margin-bottom:4px; font-size:12px; color:var(--accent);">RULING</div>
+          <div style="font-size:12px; color:var(--text2);">Enforced on-chain<br>automatically</div>
+        </div>
+      </div>
+      <div class="animate-4" style="margin-top:24px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center;">
+        <div class="card" style="max-width:340px; text-align:left;">
+          <div style="font-size:20px; margin-bottom:8px;">🪙</div>
+          <div style="font-size:14px; font-weight:700; color:var(--accent); margin-bottom:6px;">Agent B Stakes PRIV</div>
+          <div style="font-size:13px; color:var(--text2);">Before accepting any job, Agent B puts up a stake. Bad actors get slashed. Good actors get paid.</div>
+        </div>
+        <div class="card" style="max-width:340px; text-align:left;">
+          <div style="font-size:20px; margin-bottom:8px;">🎯</div>
+          <div style="font-size:14px; font-weight:700; color:var(--green); margin-bottom:6px;">Aligned Incentives</div>
+          <div style="font-size:13px; color:var(--text2);">Staking aligns incentives. Disputes are rare when both parties have skin in the game.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 8: MARKET ────────────── -->
+  <div class="slide" id="slide-8">
+    <div class="slide-inner">
+      <div class="slide-tag animate-1">Market Opportunity</div>
+      <h2 class="slide-title animate-2">The AI agent economy <span class="gradient-text">is coming</span></h2>
+      <div class="stat-grid animate-3" style="margin-top:24px;">
+        <div class="stat-card">
+          <div class="stat-number">10M+</div>
+          <div class="stat-label">AI agents projected<br>by 2027</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Agent-to-agent commerce<br>will dwarf human commerce</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">0</div>
+          <div class="stat-label">Privacy solutions exist<br>today for AI payments</div>
+        </div>
+      </div>
+      <div class="animate-4" style="margin-top:28px; font-size:clamp(14px,2vw,20px); font-weight:700; color:var(--text); max-width:700px; text-align:center; line-height:1.5;">
+        PrivChain is infrastructure.<br>
+        <span class="gradient-text">Like Stripe, but for autonomous agents.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 9: HARD QUESTIONS ────────────── -->
+  <div class="slide" id="slide-9">
+    <div class="slide-inner">
+      <div class="slide-tag animate-1">Pre-empting the Judges</div>
+      <h2 class="slide-title animate-2">We've thought about the hard stuff</h2>
+      <div class="qa-grid animate-3" style="margin-top:20px;">
+        <div class="qa-card">
+          <div class="qa-q">"Privacy is fake — Solana is public."</div>
+          <div class="qa-a"><strong>Denomination mixing + pool routing + pseudonymous wallets</strong> = relationship private + amount obfuscated. We're honest about the limits: timing correlation is a known V1 residual. V2 closes it.</div>
+        </div>
+        <div class="qa-card">
+          <div class="qa-q">"This is just escrow."</div>
+          <div class="qa-a"><strong>Commitment-reveal is trustless + pseudonymous.</strong> No shared identity. No escrow agent. Escrow requires both parties to know each other. PrivChain requires only a hash and a nullifier.</div>
+        </div>
+        <div class="qa-card">
+          <div class="qa-q">"Who arbitrates?"</div>
+          <div class="qa-a"><strong>V1: optimistic challenge window</strong> with a known arbitrator key (centralised, honest about it). <strong>V2: PRIV-staked DAO</strong> with slashing. Arbitrators with skin in the game make better decisions.</div>
+        </div>
+        <div class="qa-card">
+          <div class="qa-q">"Why PRIV? It's friction."</div>
+          <div class="qa-a"><strong>Staking and slashing require a protocol-native asset.</strong> You can't slash USDC — it's not the protocol's. <strong>PRIV is the security deposit, not the payment currency.</strong> Payments can be settled in any token.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────── SLIDE 10: CTA ────────────── -->
+  <div class="slide" id="slide-10">
+    <div class="slide-inner">
+      <div class="logo-big animate-1">PrivChain</div>
+      <div class="subtitle animate-2" style="font-size:16px; margin-bottom:4px;">
+        Built this weekend at <strong style="color:var(--text);">EasyA × Consensus Miami</strong>
+      </div>
+      <div class="divider animate-2"></div>
+      <div class="animate-3" style="margin-top:16px;">
+        <a href="https://privchain.github.io/privchain-demo" target="_blank" class="cta-btn">
+          Try the live demo →
+        </a>
+      </div>
+      <div class="link-row animate-4">
+        <div class="link-chip">🐙 <a href="https://github.com/PrivChain" target="_blank">github.com/PrivChain</a></div>
+        <div class="link-chip">🌐 <a href="https://privchain.io" target="_blank">privchain.io</a></div>
+        <div class="link-chip">🔌 <a href="https://api.privchain.io" target="_blank">api.privchain.io</a></div>
+      </div>
+      <div class="animate-5" style="margin-top:28px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+        <span class="stat-pill">🔐 ZK commitments</span>
+        <span class="stat-pill">🌊 Denomination mixing</span>
+        <span class="stat-pill">⚡ &lt;2s settlement</span>
+        <span class="stat-pill">⛓️ Solana devnet</span>
+        <span class="stat-pill">🪙 PRIV token live</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- #deck -->
+
+<script>
+  let current = 0;
+  const total = 10;
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    const prev = current;
+    slides[prev].classList.remove('active');
+    slides[prev].classList.add('exit');
+    setTimeout(() => slides[prev].classList.remove('exit'), 500);
+    current = n;
+    slides[current].classList.add('active');
+    counter.textContent = (current + 1) + ' / ' + total;
+    progress.style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  function nextSlide() { goTo(current + 1); }
+  function prevSlide() { goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault(); nextSlide();
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault(); prevSlide();
+    }
+  });
+
+  // Click anywhere on slide (not on buttons) to advance
+  document.getElementById('deck').addEventListener('click', e => {
+    if (e.target.closest('#nav-prev') || e.target.closest('#nav-next')) return;
+    nextSlide();
+  });
+
+  // Touch swipe
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) dx < 0 ? nextSlide() : prevSlide();
+  });
+</script>
+</body>
+</html>
